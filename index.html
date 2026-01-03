@@ -173,38 +173,55 @@ function render(rows){
     <div class="glass dark rounded-3xl overflow-hidden">
       <div class="p-4 border-b border-white/10 font-bold">PI: ${pi}</div>
 
-      <!-- COLUMN HEADERS -->
-      <div class="grid grid-cols-12 px-4 py-2 text-[10px] uppercase tracking-wide opacity-60 border-b border-white/10">
-        <div class="col-span-4">Item</div>
-        <div class="col-span-2 text-center leading-tight">
-          Ordered<br>Date
+      <!-- DESKTOP TABLE -->
+      <div class="hidden sm:block">
+        <div class="grid grid-cols-12 px-4 py-2 text-[11px] uppercase tracking-wide opacity-60 border-b border-white/10">
+          <div class="col-span-4">Item</div>
+          <div class="col-span-4 text-center">Ordered → Expected</div>
+          <div class="col-span-2 text-center">Qty</div>
+          <div class="col-span-2 text-center">Status</div>
         </div>
-        <div class="col-span-2 text-center leading-tight">
-          Expected<br>Delivery
-        </div>
-        <div class="col-span-2 text-center">Qty</div>
-        <div class="col-span-2 text-center">Status</div>
-      </div>
-
-      <div class="divide-y border-white/10">
-        ${groups[pi].map(r => {
-          const m = statusMeta(r.Status);
-          return `
-          <div class="grid grid-cols-12 gap-2 px-4 py-3 items-center">
-            <div class="col-span-4">
-              <div class="font-semibold mobile-tight break-words line-clamp-2">${r.Item || '-'}</div>
-              <div class="text-sm opacity-70 mobile-secondary">${r.Colour || '-'}</div>
-            </div>
-            <div class="col-span-2 text-center mobile-tight">${fmtDate(r['Order Date'])}</div>
-            <div class="col-span-2 text-center mobile-tight">${fmtDate(r.Expected_Delivery)}</div>
-            <div class="col-span-2 text-center font-semibold mobile-tight">${r.Qty || '-'}</div>
-            <div class="col-span-2 flex flex-col items-center gap-1 flex-wrap">
-              <div class="flex items-center gap-2">
-                
+        <div class="divide-y border-white/10">
+          ${groups[pi].map(r=>{
+            const m=statusMeta(r.Status);
+            return `
+            <div class="grid grid-cols-12 gap-2 px-4 py-4 items-center">
+              <div class="col-span-4">
+                <div class="font-semibold">${r.Item||'-'}</div>
+                <div class="text-sm opacity-70">${r.Colour||'-'}</div>
+              </div>
+              <div class="col-span-4 text-center">
+                ${fmtDate(r['Order Date'])} <span class="opacity-50">→</span> ${fmtDate(r.Expected_Delivery)}
+              </div>
+              <div class="col-span-2 text-center font-semibold">${r.Qty||'-'}</div>
+              <div class="col-span-2 text-center">
                 <span class="chip ${m.c}">${m.t}</span>
               </div>
-              ${r.Remarks ? `<div class="text-xs opacity-75 text-center">📝 ${r.Remarks}</div>` : ``}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- MOBILE CARDS -->
+      <div class="sm:hidden divide-y border-white/10">
+        ${groups[pi].map(r=>{
+          const m=statusMeta(r.Status);
+          return `
+          <div class="p-4 space-y-2">
+            <div class="font-semibold">${r.Item||'-'}</div>
+            <div class="text-sm opacity-70">${r.Colour||'-'}</div>
+
+            <div class="text-xs opacity-70">Ordered → Expected</div>
+            <div class="text-sm">
+              ${fmtDate(r['Order Date'])} <span class="opacity-50">→</span> ${fmtDate(r.Expected_Delivery)}
             </div>
+
+            <div class="flex items-center justify-between pt-2">
+              <div class="font-semibold">Qty: ${r.Qty||'-'}</div>
+              <span class="chip ${m.c} animate-pulse">${m.t}</span>
+            </div>
+
+            ${r.Remarks ? `<div class="text-xs opacity-70">📝 ${r.Remarks}</div>` : ``}
           </div>`;
         }).join('')}
       </div>
