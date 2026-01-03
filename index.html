@@ -216,15 +216,17 @@ function render(rows){
               <span class="chip ${m.c} animate-pulse">${m.t}</span>
             </div>
 
+            <div class="flex items-center justify-between pt-1">
+              <div class="font-semibold">Qty: ${r.Qty||'-'}</div>
+              ${r.Remarks ? `<div class="text-xs opacity-70">📝 ${r.Remarks}</div>` : ``}
+            </div>
+
             <div class="rounded-xl bg-white/5 px-3 py-2 text-sm">
               <div class="text-xs opacity-70 mb-1">Ordered → Expected</div>
               <div class="font-medium">
                 ${fmtDate(r['Order Date'])} <span class="opacity-50">→</span> ${fmtDate(r.Expected_Delivery)}
               </div>
             </div>
-
-            <div class="flex items-center justify-between pt-1">
-              <div class="font-semibold">Qty: ${r.Qty||'-'}</div>
               ${r.Remarks ? `<div class="text-xs opacity-70">📝 ${r.Remarks}</div>` : ``}
             </div>
           </div>`;
