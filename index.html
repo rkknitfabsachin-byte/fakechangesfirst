@@ -21,7 +21,7 @@ body.light{ background:#f7fbff; color:#0f172a; }
 .glass.light{ background:#ffffffee; backdrop-filter: blur(10px); border:1px solid #e2e8f0; }
 
 /* ===== STATUS CHIPS ===== */
-.chip{ padding:.25rem .7rem; border-radius:9999px; font-weight:700; font-size:.72rem }
+.chip{ padding:.25rem .6rem; border-radius:9999px; font-weight:700; font-size:.7rem; line-height:1 }
 .st-process{ background:#2563eb; color:#e5f2ff }
 .st-getting{ background:#38bdf8; color:#04293a }
 .st-ready{ background:#facc15; color:#422006 }
@@ -30,16 +30,25 @@ body.light{ background:#f7fbff; color:#0f172a; }
 
 /* ===== ANIMATIONS ===== */
 @keyframes spin{ to{ transform:rotate(360deg)} }
-@keyframes pulse{ 0%,100%{transform:scale(1)}50%{transform:scale(1.08)} }
-@keyframes shake{ 0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)} }
-@keyframes drive{ 0%{transform:translateX(-12px)}100%{transform:translateX(12px)} }
-@keyframes glow{ 0%,100%{box-shadow:0 0 0px #38bdf8}50%{box-shadow:0 0 12px #38bdf8} }
+@keyframes pulse{ 0%,100%{transform:scale(1)}50%{transform:scale(1.06)} }
+@keyframes shake{ 0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)} }
+@keyframes drive{ 0%{transform:translateX(-8px)}100%{transform:translateX(8px)} }
+@keyframes glow{ 0%,100%{box-shadow:0 0 0px #38bdf8}50%{box-shadow:0 0 8px #38bdf8} }
 
 .ico-gear{ animation:spin 1.4s linear infinite }
 .ico-check{ animation:pulse 1.6s ease-in-out infinite }
 .ico-clock{ animation:shake 1.2s ease-in-out infinite }
 .ico-truck{ animation:drive 1.2s ease-in-out infinite alternate }
 .ico-ready{ animation:glow 1.6s ease-in-out infinite }
+
+/* ===== MOBILE COMPACT MODE ===== */
+@media (max-width: 640px){
+  .chip{ font-size:.65rem }
+  .mobile-tight{ font-size:.8rem; line-height:1.15 }
+  .mobile-secondary{ font-size:.7rem }
+  /* disable heavy motion on mobile */
+  .ico-gear,.ico-check,.ico-clock,.ico-truck,.ico-ready{ animation:none }
+}
 </style>
 </head>
 
@@ -177,15 +186,15 @@ function render(rows){
         ${groups[pi].map(r => {
           const m = statusMeta(r.Status);
           return `
-          <div class="grid grid-cols-12 gap-2 px-4 py-4 items-center">
+          <div class="grid grid-cols-12 gap-2 px-4 py-3 items-center">
             <div class="col-span-4">
-              <div class="font-semibold">${r.Item || '-'}</div>
-              <div class="text-sm opacity-70">${r.Colour || '-'}</div>
+              <div class="font-semibold mobile-tight break-words line-clamp-2">${r.Item || '-'}</div>
+              <div class="text-sm opacity-70 mobile-secondary">${r.Colour || '-'}</div>
             </div>
-            <div class="col-span-2 text-center">${fmtDate(r['Order Date'])}</div>
-            <div class="col-span-2 text-center">${fmtDate(r.Expected_Delivery)}</div>
-            <div class="col-span-2 text-center font-semibold">${r.Qty || '-'}</div>
-            <div class="col-span-2 flex flex-col items-center gap-1">
+            <div class="col-span-2 text-center mobile-tight">${fmtDate(r['Order Date'])}</div>
+            <div class="col-span-2 text-center mobile-tight">${fmtDate(r.Expected_Delivery)}</div>
+            <div class="col-span-2 text-center font-semibold mobile-tight">${r.Qty || '-'}</div>
+            <div class="col-span-2 flex flex-col items-center gap-1 flex-wrap">
               <div class="flex items-center gap-2">
                 <div class="${m.i}">${m.i==='ico-gear'?'⚙️':m.i==='ico-check'?'✔️':m.i==='ico-clock'?'⏰':m.i==='ico-ready'?'🔵':'🚚'}</div>
                 <span class="chip ${m.c}">${m.t}</span>
