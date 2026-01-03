@@ -196,7 +196,7 @@ function render(rows){
             <div class="col-span-2 text-center font-semibold mobile-tight">${r.Qty || '-'}</div>
             <div class="col-span-2 flex flex-col items-center gap-1 flex-wrap">
               <div class="flex items-center gap-2">
-                <div class="${m.i}">${m.i==='ico-gear'?'⚙️':m.i==='ico-check'?'✔️':m.i==='ico-clock'?'⏰':m.i==='ico-ready'?'🔵':'🚚'}</div>
+                
                 <span class="chip ${m.c}">${m.t}</span>
               </div>
               ${r.Remarks ? `<div class="text-xs opacity-75 text-center">📝 ${r.Remarks}</div>` : ``}
