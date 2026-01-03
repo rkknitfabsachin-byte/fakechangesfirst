@@ -58,14 +58,15 @@ body.light{ background:#f7fbff; color:#0f172a; }
 <section class="glass dark rounded-3xl p-5">
   <h3 class="font-bold mb-3">Order Process Guide</h3>
   <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 text-sm">
-    <div class="flex items-center gap-2"><span class="chip st-process">IN PROCESS</span><span class="opacity-70">Processing started</span></div>
-    <div class="flex items-center gap-2"><span class="chip st-getting">GETTING READY</span><span class="opacity-70">Almost prepared</span></div>
-    <div class="flex items-center gap-2"><span class="chip st-ready">READY</span><span class="opacity-70">Ready for dispatch</span></div>
-    <div class="flex items-center gap-2"><span class="chip st-dispatched">DISPATCHED</span><span class="opacity-70">Shipped to customer</span></div>
-    <div class="flex items-center gap-2"><span class="chip st-delayed">PENDING</span><span class="opacity-70">Delayed / on hold</span></div>
+    <div class="flex items-center gap-2"><span class="chip st-process">IN PROCESS</span></div>
+    <div class="flex items-center gap-2"><span class="chip st-getting">GETTING READY</span></div>
+    <div class="flex items-center gap-2"><span class="chip st-ready">READY</span></div>
+    <div class="flex items-center gap-2"><span class="chip st-dispatched">DISPATCHED</span></div>
+    <div class="flex items-center gap-2"><span class="chip st-delayed">PENDING</span></div>
   </div>
 </section>
 
+<!-- ===== FILTERS ===== -->
 <section class="glass dark rounded-3xl p-5 grid grid-cols-1 sm:grid-cols-5 gap-4">
   <div>
     <label class="text-xs opacity-70">PI No</label>
@@ -133,7 +134,7 @@ function applyFilters(){
   if(fStatus.value) rows=rows.filter(r=>(r.Status||'').toUpperCase()===fStatus.value);
   if(fFrom.value||fTo.value){
     rows=rows.filter(r=>{
-      const d=new Date(r.Date);
+      const d=new Date(r['Order Date']);
       if(fFrom.value && d<new Date(fFrom.value)) return false;
       if(fTo.value && d>new Date(fTo.value)) return false;
       return true;
@@ -142,61 +143,45 @@ function applyFilters(){
   render(rows);
 }
 
-function render(rows){ const groups=groupByPI(rows); results.innerHTML=Object.keys(groups).map(pi=>`
+function render(rows){
+  const groups=groupByPI(rows);
+  results.innerHTML=Object.keys(groups).map(pi=>`
   <div class="glass dark rounded-3xl overflow-hidden">
     <div class="p-4 border-b border-white/10 font-bold">PI: ${pi}</div>
-    <div class="grid grid-cols-12 px-4 py-2 text-xs uppercase tracking-wider opacity-60 border-b border-white/10">
-      <div class="col-span-5">Item</div>
-      <div class="col-span-3 text-center">Ordered Date</div>
-      <div class="col-span-2 text-center">Qty</div>
-      <div class="col-span-2 text-center">Status</div>
-    </div>
+
     <div class="divide-y border-white/10">
       ${groups[pi].map(r=>{ const m=statusMeta(r.Status); return `
-      <div class="grid grid-cols-12 gap-2 px-4 py-4 items-center">
-        <div class="col-span-5">
+      <div class="px-4 py-4 grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+        <div class="sm:col-span-6">
           <div class="font-semibold">${r.Item||'-'}</div>
           <div class="text-sm opacity-70">${r.Colour||'-'}</div>
-          <div class="text-xs opacity-70 mt-1">Expected delivery: ${fmtDate(r.Expected_Delivery)}</div>
+          <div class="text-xs opacity-70 mt-1">Ordered: ${fmtDate(r['Order Date'])}</div>
+          <div class="text-xs opacity-70">Expected: ${fmtDate(r.Expected_Delivery)}</div>
         </div>
-        <div class="col-span-3 text-center">${fmtDate(r.Date)}</div>
-        <div class="col-span-2 text-center">${r.Qty||'-'}</div>
-        <div class="col-span-2 flex items-center justify-center gap-2">
-          <div class="${m.i}">${m.i==='ico-gear'?'⚙️':m.i==='ico-check'?'✔️':m.i==='ico-clock'?'⏰':m.i==='ico-ready'?'🔵':'🚚'}</div>
-          <span class="chip ${m.c}">${m.t}</span>
+        <div class="sm:col-span-2 text-center font-semibold">${r.Qty||'-'}</div>
+        <div class="sm:col-span-4 flex flex-col items-start gap-1">
+          <div class="flex items-center gap-2">
+            <div class="${m.i}">${m.i==='ico-gear'?'⚙️':m.i==='ico-check'?'✔️':m.i==='ico-clock'?'⏰':m.i==='ico-ready'?'🔵':'🚚'}</div>
+            <span class="chip ${m.c}">${m.t}</span>
+          </div>
+          ${r.Remarks ? `<div class="text-xs opacity-75">📝 ${r.Remarks}</div>` : ``}
         </div>
       </div>`; }).join('')}
     </div>
-  </div>`).join(''); }
+  </div>`).join('');
+}
 
 async function load(){
-  try{
-    const u = new URL(API);
-    // 👇 Canvas / preview fallback
-    u.searchParams.set('party', partyKey || 'PREVIEW');
-
-    const res = await fetch(u);
-    const j = await res.json();
-    master = j.data || [];
-
-    // 👇 If API returns empty in canvas, inject demo rows so preview is visible
-    if(master.length === 0){
-      master = [
-        { PI_No:'PI-001', Item:'Cotton Lycra', Colour:'Black', Qty:120, Date:'2025-01-02', Expected_Delivery:'2025-01-10', Status:'IN PROCESS' },
-        { PI_No:'PI-001', Item:'Cotton Lycra', Colour:'Black', Qty:120, Date:'2025-01-02', Expected_Delivery:'2025-01-10', Status:'GETTING READY' },
-        { PI_No:'PI-002', Item:'Fleece Fabric', Colour:'Grey', Qty:200, Date:'2025-01-03', Expected_Delivery:'2025-01-12', Status:'READY' },
-        { PI_No:'PI-003', Item:'Single Jersey', Colour:'Navy', Qty:150, Date:'2025-01-04', Expected_Delivery:'2025-01-15', Status:'DISPATCHED' },
-        { PI_No:'PI-004', Item:'Rib Fabric', Colour:'Maroon', Qty:90, Date:'2025-01-05', Expected_Delivery:'2025-01-18', Status:'PENDING' }
-      ];
-    }
-
-    buildPI(master);
-    applyFilters();
-  }catch(err){
-    console.error('Load failed', err);
-  }
+  const u=new URL(API);
+  u.searchParams.set('party', partyKey || 'PREVIEW');
+  const j=await (await fetch(u)).json();
+  master=j.data||[];
+  buildPI(master);
+  applyFilters();
 }
-[fPI,fStatus,fFrom,fTo].forEach(el=>el.addEventListener('change',applyFilters)); load();
+
+[fPI,fStatus,fFrom,fTo].forEach(el=>el.addEventListener('change',applyFilters));
+load();
 </script>
 </body>
 </html>
