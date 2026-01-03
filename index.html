@@ -163,6 +163,13 @@ function render(rows){
   results.innerHTML=Object.keys(groups).map(pi=>`
   <div class="glass dark rounded-3xl overflow-hidden">
     <div class="p-4 border-b border-white/10 font-bold">PI: ${pi}</div>
+    <!-- COLUMN HEADERS -->
+    <div class="grid grid-cols-12 px-4 py-2 text-xs uppercase tracking-wider opacity-60 border-b border-white/10">
+      <div class="col-span-5">Item</div>
+      <div class="col-span-3 text-center">Ordered Date</div>
+      <div class="col-span-2 text-center">Qty</div>
+      <div class="col-span-2 text-center">Status</div>
+    </div>
 
     <div class="divide-y border-white/10">
       ${groups[pi].map(r=>{ const m=statusMeta(r.Status); return `
